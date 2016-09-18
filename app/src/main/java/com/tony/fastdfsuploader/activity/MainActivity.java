@@ -17,7 +17,16 @@ import com.tony.fastdfsuploader.R;
 import com.tony.fastdfsuploader.jni.FastDFSUploader;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private final String TAG = "MainActivity";
+    private static final String TAG = "MainActivity";
+
+    static {
+
+        try {
+            System.loadLibrary("fastdfsuploader");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private static final int SELECT_VIDEO = 1000;
 
@@ -54,8 +63,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivityForResult(photoPickerIntent, SELECT_VIDEO);
                 break;
             case R.id.bt_upload:
-                String path = et_filepath.toString().trim();
-                int result = FastDFSUploader.upload(path);
+                String path = et_filepath.getText().toString().trim();
+                int result = upload(path);
 
                 Log.i(TAG, "result: " + result);
                 break;
@@ -94,9 +103,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 回调上传进度, c中调用
      * @param progress 0.0 ~ 1.0
      */
-    public void uploadProgress(float progress) {
+    public void setUploadProgress(float progress) {
 
+        Log.i(TAG, "upload progress: " + progress);
+
+        pb_upload.setProgress((int)(progress * 100));
     }
 
+    /**
+     * 执行上传
+     * @param path 传入的文件路径
+     * @return
+     */
+    public native int upload(String path);
 
 }
